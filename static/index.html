@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Digest</title>
+    <style>
+        :root {
+            --bg: #1a1a2e;
+            --card-bg: #16213e;
+            --accent: #0f3460;
+            --text: #e8e8e8;
+            --text-muted: #a0a0a0;
+            --highlight: #e94560;
+            --success: #4ecca3;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--accent);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        button {
+            background: var(--highlight);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: opacity 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid var(--accent);
+            border-top-color: var(--highlight);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        section {
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+        }
+
+        .count-list {
+            display: grid;
+            gap: 8px;
+        }
+
+        .count-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: var(--accent);
+            border-radius: 6px;
+        }
+
+        .count-item .name {
+            font-weight: 500;
+        }
+
+        .count-item .count {
+            background: var(--highlight);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+        }
+
+        .forum-group {
+            margin-bottom: 10px;
+        }
+
+        .forum-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background: var(--accent);
+            border-radius: 6px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .forum-header:hover {
+            opacity: 0.9;
+        }
+
+        .forum-name {
+            font-weight: 600;
+            color: var(--success);
+        }
+
+        .forum-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .forum-count {
+            background: var(--highlight);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+        }
+
+        .expand-icon {
+            font-size: 0.8rem;
+            transition: transform 0.2s;
+        }
+
+        .forum-group.expanded .expand-icon {
+            transform: rotate(90deg);
+        }
+
+        .topic-list {
+            margin-left: 20px;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .forum-group.expanded .topic-list {
+            display: grid;
+        }
+
+        .summary-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--highlight);
+        }
+
+        .summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .summary-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .summary-meta {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .summary-type {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            background: var(--accent);
+        }
+
+        .summary-type.technical { background: #1e5128; }
+        .summary-type.memes { background: #7b113a; }
+        .summary-type.logistics { background: #1a4d8c; }
+
+        .summary-content {
+            white-space: pre-wrap;
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .summary-content h2 {
+            font-size: 1rem;
+            color: var(--text);
+            margin-top: 15px;
+            margin-bottom: 8px;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        .error-list {
+            background: #4a1c1c;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .error-item {
+            color: #ff8a8a;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
+        }
+
+        .zero-count {
+            opacity: 0.4;
+        }
+
+        .zero-count .count {
+            background: var(--accent);
+        }
+
+        .timestamp {
+            text-align: right;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>📬 Telegram Digest</h1>
+        <button id="refreshBtn" onclick="fetchDigest()">Refresh</button>
+    </header>
+
+    <main id="content">
+        <div class="loading">
+            <div class="spinner"></div>
+            <p>Click Refresh to load your digest</p>
+        </div>
+    </main>
+
+    <script>
+        async function fetchDigest() {
+            const btn = document.getElementById('refreshBtn');
+            const content = document.getElementById('content');
+
+            btn.disabled = true;
+            btn.textContent = 'Loading...';
+
+            content.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Fetching messages and generating summaries...</p>
+                </div>
+            `;
+
+            try {
+                const response = await fetch('/api/digest?since_hours=24');
+                if (!response.ok) throw new Error('Failed to fetch digest');
+
+                const data = await response.json();
+                renderDigest(data);
+            } catch (error) {
+                content.innerHTML = `
+                    <div class="error-list">
+                        <div class="error-item">Error: ${error.message}</div>
+                    </div>
+                `;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Refresh';
+            }
+        }
+
+        function renderDigest(data) {
+            const content = document.getElementById('content');
+            let html = '';
+
+            // Message Counts Section
+            html += '<section><h2>Message Counts</h2>';
+
+            // DMs
+            if (data.message_counts.dms && data.message_counts.dms.length > 0) {
+                html += '<div class="card"><h3 style="margin-bottom:10px;color:var(--success)">Direct Messages</h3><div class="count-list">';
+                for (const dm of data.message_counts.dms) {
+                    html += `<div class="count-item"><span class="name">${dm.name}</span><span class="count">${dm.count}</span></div>`;
+                }
+                html += '</div></div>';
+            }
+
+            // Regular Groups
+            if (data.message_counts.groups && data.message_counts.groups.length > 0) {
+                html += '<div class="card"><h3 style="margin-bottom:10px;color:var(--success)">Groups</h3><div class="count-list">';
+                for (const group of data.message_counts.groups) {
+                    html += `<div class="count-item"><span class="name">${group.name}</span><span class="count">${group.count}</span></div>`;
+                }
+                html += '</div></div>';
+            }
+
+            // Forums with Topics (collapsible)
+            if (data.message_counts.forums && data.message_counts.forums.length > 0) {
+                html += '<div class="card"><h3 style="margin-bottom:15px;color:var(--success)">Forums</h3>';
+                let forumIndex = 0;
+                for (const forum of data.message_counts.forums) {
+                    const forumId = `forum-${forumIndex++}`;
+                    html += `<div class="forum-group" id="${forumId}">`;
+                    html += `<div class="forum-header" onclick="toggleForum('${forumId}')">`;
+                    html += `<span class="forum-name">${forum.name}</span>`;
+                    html += `<div class="forum-meta"><span class="forum-count">${forum.total_count}</span><span class="expand-icon">▶</span></div>`;
+                    html += `</div>`;
+                    html += `<div class="topic-list count-list">`;
+                    for (const topic of forum.topics) {
+                        const countClass = topic.count > 0 ? '' : 'zero-count';
+                        html += `<div class="count-item ${countClass}"><span class="name">${topic.name}</span><span class="count">${topic.count}</span></div>`;
+                    }
+                    html += '</div></div>';
+                }
+                html += '</div>';
+            }
+
+            // Check if all empty
+            const totalCounts = (data.message_counts.dms?.length || 0) +
+                               (data.message_counts.groups?.length || 0) +
+                               (data.message_counts.forums?.length || 0);
+            if (totalCounts === 0) {
+                html += '<div class="empty-state">No unread messages!</div>';
+            }
+
+            html += '</section>';
+
+            // Summaries Section
+            if (data.summaries && data.summaries.length > 0) {
+                html += '<section><h2>AI Summaries</h2>';
+                for (const summary of data.summaries) {
+                    html += `
+                        <div class="summary-card">
+                            <div class="summary-header">
+                                <div>
+                                    <div class="summary-title">${summary.group} → ${summary.topic}</div>
+                                    <div class="summary-meta">${summary.message_count} messages</div>
+                                </div>
+                                <span class="summary-type ${summary.type}">${summary.type}</span>
+                            </div>
+                            <div class="summary-content">${formatSummary(summary.summary)}</div>
+                        </div>
+                    `;
+                }
+                html += '</section>';
+            }
+
+            // Errors
+            if (data.errors && data.errors.length > 0) {
+                html += '<section><h2>Errors</h2><div class="error-list">';
+                for (const error of data.errors) {
+                    html += `<div class="error-item">${error}</div>`;
+                }
+                html += '</div></section>';
+            }
+
+            // Timestamp
+            html += `<div class="timestamp">Last updated: ${new Date().toLocaleString()}</div>`;
+
+            content.innerHTML = html;
+        }
+
+        function formatSummary(text) {
+            // Convert markdown-style headers and formatting
+            return text
+                .replace(/## (.*)/g, '<h2>$1</h2>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\n- /g, '\n• ')
+                .replace(/\n/g, '<br>');
+        }
+
+        function toggleForum(forumId) {
+            const forum = document.getElementById(forumId);
+            if (forum) {
+                forum.classList.toggle('expanded');
+            }
+        }
+    </script>
+</body>
+</html>

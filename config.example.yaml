@@ -1,0 +1,56 @@
+# Telegram Digest Configuration
+# =============================
+# Copy this file to config.yaml and edit with your settings.
+
+my_name: "YourName"
+
+# Groups to exclude from message counts entirely
+excluded_groups:
+  - "Noisy Group"
+  - "Archived Stuff"
+
+# Groups with specific summarisation rules
+groups:
+  # -------------------------
+  # Example: Forum with topics
+  # -------------------------
+  - name: "AI Discussion"
+    topics:
+      - name: "General"
+        type: "technical"
+        threshold: 10
+
+      - name: "Memes"
+        type: "memes"
+        threshold: 1
+
+      - name: "Announcements"
+        type: "skip"
+
+    # All other topics in this group get skipped
+    default_type: "skip"
+
+  # -------------------------
+  # Example: Another forum
+  # -------------------------
+  - name: "Project Planning"
+    topics:
+      - name: "Tasks"
+        type: "logistics"
+        threshold: 5
+
+    default_type: "logistics"
+
+  # -------------------------
+  # Example: Standalone group (no topics)
+  # -------------------------
+  - name: "Event Invites Channel"
+    type: "invites"
+    threshold: 1
+
+# Summary type definitions:
+# - technical: Arguments, pros/cons, top 1-2 links/papers, context from previous convos
+# - memes: Top 3 memes, explain AI safety context if relevant
+# - logistics: To-dos, calls for help, anything directed at my_name
+# - invites: One-liner per invite: what, when, where, who is inviting
+# - skip: No summary, not even in message counts for this topic

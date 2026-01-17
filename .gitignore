@@ -1,0 +1,7 @@
+.env
+*.session
+__pycache__/
+*.pyc
+.DS_Store
+config.yaml
+CLAUDE.md
