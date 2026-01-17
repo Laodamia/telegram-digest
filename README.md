@@ -85,7 +85,7 @@ groups:
 |------|-----------------|
 | `technical` | Topic, arguments pro/con, links/papers, context |
 | `logistics` | To-dos, action items, mentions of you |
-| `memes` | Top 3 memes with AI safety context if relevant |
+| `memes` | Top 3 memes, or jokes |
 | `skip` | No summary |
 
 ## Deployment (Render)
