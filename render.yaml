@@ -1,0 +1,24 @@
+# Render Blueprint
+# https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: telegram-digest
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: TELEGRAM_API_ID
+        sync: false
+      - key: TELEGRAM_API_HASH
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: MY_IDENTIFIERS
+        sync: false
+      - key: TELEGRAM_SESSION_STRING
+        sync: false
+      - key: DIGEST_SECRET_TOKEN
+        sync: false
+      - key: CONFIG_YAML
+        sync: false
