@@ -86,31 +86,32 @@ Be concise but preserve technical nuance. Use bullet points."""
 async def summarise_memes(messages: List[Dict], topic_name: str) -> str:
     """
     Summarise meme channel.
-    Extracts: top 3 memes, explains AI safety context if relevant.
+    Extracts: top 3 memes, explains context if relevant.
     """
     if not messages:
         return "No memes to report."
 
     messages_text = format_messages_for_prompt(messages)
 
-    prompt = f"""Summarise the memes shared in this Telegram channel "{topic_name}".
+    prompt = f"""Summarise the memes and jokes shared in this Telegram channel "{topic_name}".
 
 MESSAGES:
 {messages_text}
 
 Format as follows:
 
-## Top 3 Memes
-For each meme, provide:
-1. **[Brief description]** - [Why it's funny/relevant]
-   - AI Safety Context: [If this relates to recent AI safety news/events, explain. If not, write "General humour"]
+## Top 3 Memes/Jokes
+For each, provide:
+1. **[Brief description]** - [Why it's funny]
+   - Context: [If this references current events, news, internet culture, or niche topics, briefly explain. If it's self-explanatory, skip this line.]
 
 2. ...
 
 3. ...
 
-If fewer than 3 memes were shared, just describe what was shared.
-If messages describe images you can't see, do your best to infer from context and reactions."""
+If fewer than 3 were shared, just describe what was shared.
+If messages describe images you can't see, do your best to infer from context and reactions.
+Keep it light and fun."""
 
     response = client.messages.create(
         model="claude-sonnet-4-20250514",

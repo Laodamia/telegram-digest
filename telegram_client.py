@@ -7,6 +7,7 @@ import os
 from datetime import datetime, timedelta
 from typing import Optional
 from telethon import TelegramClient
+from telethon.sessions import StringSession
 from telethon.tl.types import Channel, User, Chat, Message
 from telethon.tl.functions.messages import GetDialogsRequest
 from telethon.tl.types import InputPeerEmpty
@@ -16,12 +17,17 @@ load_dotenv()
 
 API_ID = int(os.getenv("TELEGRAM_API_ID"))
 API_HASH = os.getenv("TELEGRAM_API_HASH")
+SESSION_STRING = os.getenv("TELEGRAM_SESSION_STRING")
 SESSION_NAME = "telegram_digest_session"
 
 
 class TelegramDigestClient:
     def __init__(self):
-        self.client = TelegramClient(SESSION_NAME, API_ID, API_HASH)
+        # Use string session if available (for cloud deployment), otherwise file session
+        if SESSION_STRING:
+            self.client = TelegramClient(StringSession(SESSION_STRING), API_ID, API_HASH)
+        else:
+            self.client = TelegramClient(SESSION_NAME, API_ID, API_HASH)
 
     async def connect(self):
         """Connect to Telegram. Will prompt for phone/code on first run."""

@@ -50,7 +50,7 @@ groups:
 
 # Summary type definitions:
 # - technical: Arguments, pros/cons, top 1-2 links/papers, context from previous convos
-# - memes: Top 3 memes, explain AI safety context if relevant
+# - memes: Top 3 memes/jokes with context if needed (works for any topic, not just AI)
 # - logistics: To-dos, calls for help, anything directed at my_name
 # - invites: One-liner per invite: what, when, where, who is inviting
 # - skip: No summary, not even in message counts for this topic

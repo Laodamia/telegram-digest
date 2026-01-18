@@ -6,10 +6,11 @@ A web app that shows your unread Telegram messages with AI-powered summaries for
 
 - **Message counts** for all DMs and groups
 - **AI summaries** for configured groups/topics using Claude
-- **Three summary types:**
+- **Four summary types:**
   - `technical` - Arguments, pros/cons, key links/papers
   - `logistics` - To-dos, action items, mentions of you
-  - `memes` - Top memes with context
+  - `memes` - Top memes/jokes with context when needed
+  - `invites` - One-liner per event invite
 - **Exclude groups** you don't want to see
 - **Accessible from anywhere** when deployed
 
@@ -54,6 +55,16 @@ Follow the prompts to configure everything.
 
 6. **Open** http://localhost:8000
 
+### Optional: Install command
+
+To run `telegram-digest` from anywhere in your terminal:
+
+```bash
+./install.sh
+```
+
+Then just type `telegram-digest` from any directory.
+
 ## Configuration
 
 ### config.yaml
@@ -82,19 +93,41 @@ groups:
 ### Summary Types
 
 | Type | What it extracts |
-|------|-----------------|
+|------|------------------|
 | `technical` | Topic, arguments pro/con, links/papers, context |
 | `logistics` | To-dos, action items, mentions of you |
-| `memes` | Top 3 memes with AI safety context if relevant |
+| `memes` | Top 3 memes/jokes with context when needed |
+| `invites` | One-liner per invite: what, when, where, who |
 | `skip` | No summary |
 
 ## Deployment (Render)
 
-1. Push code to GitHub
-2. Create new Web Service on Render
-3. Set environment variables from `.env`
-4. Upload your `telegram_digest_session.session` file
-5. Deploy
+1. **Export your session string** (locally, after running `auth.py`):
+   ```bash
+   python export_session.py
+   ```
+   Copy the session string.
+
+2. **Push code to GitHub**
+
+3. **Create new Web Service on Render:**
+   - Connect your GitHub repo
+   - Build command: `pip install -r requirements.txt`
+   - Start command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+
+4. **Set environment variables in Render:**
+   - `TELEGRAM_API_ID` - your Telegram API ID
+   - `TELEGRAM_API_HASH` - your Telegram API hash
+   - `ANTHROPIC_API_KEY` - your Claude API key
+   - `MY_IDENTIFIERS` - your name and Telegram handle (comma-separated)
+   - `TELEGRAM_SESSION_STRING` - from step 1
+   - `DIGEST_SECRET_TOKEN` - pick a random secret string
+   - `CONFIG_YAML` - paste your config.yaml contents (run `python export_config.py`)
+
+5. **Deploy and access at:**
+   ```
+   https://your-app.onrender.com?token=YOUR_SECRET_TOKEN
+   ```
 
 ## Files
 

@@ -7,17 +7,34 @@ import os
 import yaml
 from contextlib import asynccontextmanager
 from typing import Optional
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends, Query
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from telegram_client import TelegramDigestClient
 from summariser import summarise
 
-# Load config
-with open("config.yaml", "r") as f:
-    CONFIG = yaml.safe_load(f)
+# Load config from file or environment variable
+CONFIG_YAML = os.getenv("CONFIG_YAML")
+if CONFIG_YAML:
+    CONFIG = yaml.safe_load(CONFIG_YAML)
+else:
+    with open("config.yaml", "r") as f:
+        CONFIG = yaml.safe_load(f)
+
+# Secret token for authentication (optional, for cloud deployment)
+SECRET_TOKEN = os.getenv("DIGEST_SECRET_TOKEN")
+
+
+def verify_token(token: str = Query(None)):
+    """Verify the secret token if one is configured."""
+    if SECRET_TOKEN and token != SECRET_TOKEN:
+        raise HTTPException(status_code=401, detail="Invalid or missing token")
+    return True
 
 # Global telegram client
 tg_client: Optional[TelegramDigestClient] = None
@@ -93,13 +110,15 @@ def is_excluded_group(group_name: str) -> bool:
 
 
 @app.get("/")
-async def root():
+async def root(token: str = Query(None)):
     """Serve the main page."""
+    if SECRET_TOKEN and token != SECRET_TOKEN:
+        raise HTTPException(status_code=401, detail="Invalid or missing token. Add ?token=YOUR_TOKEN to the URL.")
     return FileResponse("static/index.html")
 
 
 @app.get("/api/digest")
-async def get_digest(since_hours: int = 24):
+async def get_digest(since_hours: int = 24, authorized: bool = Depends(verify_token)):
     """
     Get full digest:
     1. Message counts for all chats

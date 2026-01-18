@@ -287,6 +287,10 @@
     </main>
 
     <script>
+        // Get token from URL if present
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+
         async function fetchDigest() {
             const btn = document.getElementById('refreshBtn');
             const content = document.getElementById('content');
@@ -302,7 +306,8 @@
             `;
 
             try {
-                const response = await fetch('/api/digest?since_hours=24');
+                const tokenParam = token ? `&token=${token}` : '';
+                const response = await fetch(`/api/digest?since_hours=24${tokenParam}`);
                 if (!response.ok) throw new Error('Failed to fetch digest');
 
                 const data = await response.json();
