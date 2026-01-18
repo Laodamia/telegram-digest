@@ -5,12 +5,19 @@ Different prompts for different topic types.
 
 import os
 from typing import List, Dict
-from anthropic import Anthropic
 from dotenv import load_dotenv
 
 load_dotenv()
 
-client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+# Lazy-load client to avoid import-time initialization issues
+_client = None
+
+def get_client():
+    global _client
+    if _client is None:
+        from anthropic import Anthropic
+        _client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+    return _client
 
 # Support multiple identifiers (name, handle, etc.)
 _identifiers = os.getenv("MY_IDENTIFIERS", "Marta")
@@ -74,7 +81,7 @@ Extract and format as follows:
 
 Be concise but preserve technical nuance. Use bullet points."""
 
-    response = client.messages.create(
+    response = get_client().messages.create(
         model="claude-sonnet-4-20250514",
         max_tokens=1000,
         messages=[{"role": "user", "content": prompt}]
@@ -113,7 +120,7 @@ If fewer than 3 were shared, just describe what was shared.
 If messages describe images you can't see, do your best to infer from context and reactions.
 Keep it light and fun."""
 
-    response = client.messages.create(
+    response = get_client().messages.create(
         model="claude-sonnet-4-20250514",
         max_tokens=800,
         messages=[{"role": "user", "content": prompt}]
@@ -154,7 +161,7 @@ Extract and format as follows:
 
 Be concise. Focus on actionable items."""
 
-    response = client.messages.create(
+    response = get_client().messages.create(
         model="claude-sonnet-4-20250514",
         max_tokens=800,
         messages=[{"role": "user", "content": prompt}]
@@ -187,7 +194,7 @@ If no invites found, write "No new invites."
 
 Keep it concise - one line per invite."""
 
-    response = client.messages.create(
+    response = get_client().messages.create(
         model="claude-sonnet-4-20250514",
         max_tokens=500,
         messages=[{"role": "user", "content": prompt}]

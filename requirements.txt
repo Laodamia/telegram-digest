@@ -1,8 +1,8 @@
-# Updated Jan 2026 - pinned versions for Render compatibility
-fastapi==0.115.0
-uvicorn==0.34.0
-telethon==1.38.1
-anthropic==0.42.0
-httpx==0.28.1
-python-dotenv==1.0.1
-pyyaml==6.0.2
+# Updated Jan 2026 - latest versions for Python 3.13 compatibility
+fastapi
+uvicorn
+telethon
+anthropic
+httpx
+python-dotenv
+pyyaml
