@@ -1,8 +1,8 @@
-# Updated Jan 2026 - latest versions for Python 3.13 compatibility
+# Updated Jan 2026
 fastapi
 uvicorn
 telethon
 anthropic
-httpx
+httpx==0.27.2
 python-dotenv
 pyyaml
